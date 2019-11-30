@@ -1,0 +1,3 @@
+[submodule "VS-Utils"]
+	path = VS-Utils
+	url = https://github.com/salsh/VS-Utils
