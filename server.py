@@ -1,32 +1,33 @@
+#################################################
+##              Scope: Host system             ##
+#################################################
 import os, sys, subprocess, logging
-
-## Add the VS-Utils submodule to the python path
-cur_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(cur_dir, "VS-Utils"))
-from parse import parse_cfg, validate_input
 
 ## Set the logger and its level
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-def server(cfg, option, filepath):
-    ''' Validate the query, get all media infos and add it. '''
+def server(cfg, filepath):
+    """ Validate the incoming query and add it to the SynoIndex database.
 
-    logger.debug("[!] Get new query with arguments: %s, %s" %(option, filepath))
-    ## Read input
-    filepath = validate_input(cfg.mapping, option, filepath)
-    if(filepath == -1):
-        logger.error("[-] Error: Option not supported")
-        return "[-] Error: Option not supported"
-    if(filepath == -2):
-        logger.error("[-] Error: Filepath seems invalid")
-        return "[-] Error: Filepath seems invalid"
+    Arguments:
+        cfg {Namspace} -- Configuration Namespace.
+        filepath {string} -- Encoded path to the video file on the hostsystem.
+
+    Returns:
+        string -- Message whether the addition process was succesful or not.
+    """
+
+    logger.debug("[!] Get new query with arguments: %s" % filepath)
+    if not os.path.isfile(filepath):
+        logger.error("[-] Error: File does not exist")
+        return "[-] Error: File does not exist"
 
     cmds = ['synoindex', '-A', filepath.encode('UTF-8')]
     logger.debug("synoindex -A %s " % filepath.encode('UTF-8'))
     p = subprocess.Popen(cmds, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
     stderr=subprocess.PIPE)
-    output, _ = p.communicate()
+    p.communicate()
     logger.debug("[x] Executed query")
     logger.debug("")
     return "[x] Executed query"

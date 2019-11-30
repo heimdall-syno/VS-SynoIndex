@@ -1,4 +1,7 @@
-import os, web, logging
+#################################################
+##              Scope: Host system             ##
+#################################################
+import os, sys, web, logging
 
 ## Add the VS-Utils submodule to the python path
 cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -7,8 +10,8 @@ from parse import parse_cfg
 from server import server
 
 ## Parse the config
-config_file = os.path.dirname(os.path.abspath(__file__)) + '/config.txt'
-cfg = parse_cfg(config_file, "server")
+config_file = os.path.join(cur_dir, "config.txt")
+cfg = parse_cfg(config_file, "vs-synoindex", "host")
 
 ## Setup the logging files
 server_log = "%s/%s" % (cfg.server_logs, "server.log")
@@ -32,8 +35,8 @@ class Webserver(web.application):
 
 class webservice:
 	def GET(self, name):
-		user_data = web.input(option="", filepath="")
-		result = server(cfg, user_data.option, user_data.filepath)
+		user_data = web.input(filepath="")
+		result = server(cfg, user_data.filepath)
 		return result
 
 if __name__ == "__main__":

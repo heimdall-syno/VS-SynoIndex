@@ -1,16 +1,19 @@
+#################################################
+##           Scope: Docker-Container           ##
+#################################################
 import os, sys, urllib, urllib2, logging
 
 ## Add the VS-Utils submodule to the python path
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(cur_dir, "VS-Utils"))
-from parse import parse_cfg, synoindex_modes
-
-## Parse the config
-config_file = os.path.dirname(os.path.abspath(__file__)) + '/config.txt'
-cfg = parse_cfg(config_file, "server")
+from parse import parse_cfg
 
 ### Synoindex-Client
-def client(option, filepath):
+def client(filepath):
+
+	## Parse the config
+	config_file = os.path.join(cur_dir, "config.txt")
+	cfg = parse_cfg(config_file, "vs-synoindex", "docker")
 
 	## Setup the client logging file
 	client_log = "%s/%s" % (cfg.client_logs, "client.log")
@@ -21,14 +24,8 @@ def client(option, filepath):
 	logger = logging.getLogger(__name__)
 	logger.setLevel(logging.DEBUG)
 
-	## Validation of the arguments
-	if(option not in synoindex_modes):
-		logger.error("Passed option not supported"); exit()
-	if not os.path.exists(filepath):
-		logger.error("Passed file does not exist"); exit()
-
 	## Call the url and get the answer of the server
-	query_vars = {'option': option, 'filepath': filepath}
+	query_vars = {'option': 'a', 'filepath': filepath}
 	url = "%s/synoindex?" % cfg.url
 	url = url + urllib.urlencode(query_vars)
 	logger.debug(url)
