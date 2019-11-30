@@ -7,4 +7,4 @@ server_port = 32699
 server_logs = /volume1/docker/logs
 
 [Client]
-client_logs = /data/logs
+client_logs = /docker/logs

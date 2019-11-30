@@ -5,8 +5,12 @@ cur_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(cur_dir, "VS-Utils"))
 from parse import parse_cfg, synoindex_modes
 
+## Parse the config
+config_file = os.path.dirname(os.path.abspath(__file__)) + '/config.txt'
+cfg = parse_cfg(config_file, "server")
+
 ### Synoindex-Client
-def client(cfg, option, filepath):
+def client(option, filepath):
 
 	## Setup the client logging file
 	client_log = "%s/%s" % (cfg.client_logs, "client.log")
