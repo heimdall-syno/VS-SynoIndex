@@ -1,21 +1,10 @@
 ##############################################################
-##          Config file for the VS-Transmission             ##
+##          Config file for the VS-SynoIndex                ##
 ##############################################################
 
 [Server]
 server_port = 32699
-server_logs = /volume1/docker/transmission/logs
+server_logs = /volume1/docker/logs
 
 [Client]
 client_logs = /data/logs
-
-[Mapping]
-/serien = /volume1/Serien
-/filme = /volume1/Filme
-/video = /volume1/video
-/dokus = /volume1/Dokus
-/tools = /volume1/Tools
-/anime = /volume1/Anime
-
-[Handbrake]
-handbrake = /volume1/docker/handbrake

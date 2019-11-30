@@ -1,4 +1,8 @@
 import os, sys, subprocess, logging
+
+## Add the VS-Utils submodule to the python path
+cur_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(cur_dir, "VS-Utils"))
 from parse import parse_cfg, validate_input
 
 ## Set the logger and its level

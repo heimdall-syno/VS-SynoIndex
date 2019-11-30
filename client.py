@@ -1,6 +1,8 @@
 import os, sys, urllib, urllib2, logging
 
-sys.path.insert(1, os.path.join(sys.path[0], '..'))
+## Add the VS-Utils submodule to the python path
+cur_dir = os.path.dirname(os.path.abspath(__file__))
+sys.path.append(os.path.join(cur_dir, "VS-Utils"))
 from parse import parse_cfg, synoindex_modes
 
 ### Synoindex-Client
