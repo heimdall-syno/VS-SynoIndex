@@ -36,7 +36,7 @@ class Webserver(web.application):
 class webservice:
 	def GET(self, name):
 		user_data = web.input(source_host="", output_host="")
-		result = server(cfg, user_data.source_host, user_data.output_host)
+		result = server(user_data.source_host, user_data.output_host)
 		return result
 
 if __name__ == "__main__":
