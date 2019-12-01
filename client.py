@@ -9,7 +9,7 @@ sys.path.append(os.path.join(cur_dir, "VS-Utils"))
 from parse import parse_cfg
 
 ### Synoindex-Client
-def client(filepath):
+def client(source_host, output_host=None):
 
 	## Parse the config
 	config_file = os.path.join(cur_dir, "config.txt")
@@ -25,7 +25,10 @@ def client(filepath):
 	logger.setLevel(logging.DEBUG)
 
 	## Call the url and get the answer of the server
-	query_vars = {'option': 'a', 'filepath': filepath}
+	if not output_host:
+		query_vars = {'source_host': source_host}
+	else:
+		query_vars = {'source_host': source_host, 'output_host': output_host}
 	url = "%s/synoindex?" % cfg.url
 	url = url + urllib.urlencode(query_vars)
 	logger.debug(url)
