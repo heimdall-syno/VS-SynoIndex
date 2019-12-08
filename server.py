@@ -25,7 +25,8 @@ def server(source_host, output_host):
     """
 
     ## Check whether the source file exists
-    logger.debug("[!] Get new query (Source: %s, Output: %s)" % (source_host, output_host))
+    logger.debug("Source: %s" % source_host)
+    logger.debug("Output: %s" , output_host)
 
     if not output_host:
         if not os.path.isfile(source_host):
@@ -36,13 +37,14 @@ def server(source_host, output_host):
     else:
         create_path_directories(os.path.dirname(source_host))
         shutil.move(output_host, source_host)
+        logger.debug("Moved file first")
         if not os.path.isfile(source_host):
             logger.error("[-] Error: Moving file failed")
             return "[-] Error: Moving file failed"
 
     ## Add the file to synoindex database
     cmds = ['synoindex', '-A', source_host.encode('UTF-8')]
-    logger.debug("synoindex -A %s " % source_host.encode('UTF-8'))
+    logger.debug("Add video file to SynoIndex")
     p = subprocess.Popen(cmds, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
     stderr=subprocess.PIPE)
     p.communicate()
