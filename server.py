@@ -25,7 +25,7 @@ def server(source_host, output_host):
     """
 
     ## Check whether the source file exists
-    logger.debug("[!] Get new query with arguments: %s, %s" % (source_host, output_host))
+    logger.debug("[!] Get new query (Source: %s, Output: %s)" % (source_host, output_host))
 
     if not output_host:
         if not os.path.isfile(source_host):
