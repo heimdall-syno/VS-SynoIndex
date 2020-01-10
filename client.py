@@ -23,6 +23,6 @@ def client(source_host, output_host=None):
 		query_vars = {'source_host': source_host, 'output_host': output_host}
 	url = "%s/synoindex?" % cfg.url
 	url = url + urllib.urlencode(query_vars)
-	debugmsg("Sent to SynoIndex-Server")
+	debugmsg("Sent to SynoIndex-Server", "SynoClient")
 	contents = urllib2.urlopen(url).read()
-	debugmsg("SynoIndex-Server answered with", (contents,))
+	debugmsg("SynoIndex-Server answered with", "SynoClient", (contents,))
