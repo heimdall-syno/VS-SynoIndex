@@ -1,7 +1,9 @@
 #################################################
 ##           Scope: Docker-Container           ##
 #################################################
-import os, sys, urllib, urllib2, logging
+import os, sys, urllib, logging
+from urllib.request import urlopen
+from urllib.parse import urlencode
 
 ## Add the VS-Utils submodule to the python path
 cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -22,7 +24,7 @@ def client(source_host, output_host=None):
 	else:
 		query_vars = {'source_host': source_host, 'output_host': output_host}
 	url = "%s/synoindex?" % cfg.url
-	url = url + urllib.urlencode(query_vars)
+	url = url + urlencode(query_vars)
 	debugmsg("Sent to SynoIndex-Server", "SynoClient")
-	contents = urllib2.urlopen(url).read()
+	contents = urlopen(url).read()
 	debugmsg("SynoIndex-Server answered with", "SynoClient", (contents,))
