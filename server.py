@@ -6,13 +6,14 @@ import os, sys, subprocess, logging, shutil
 ## Add the VS-Utils submodule to the python path
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(cur_dir, "VS-Utils"))
-from files import create_path_directories
+from files import create_path_directories, files_find_ext
+from files import files_find_basename
 
 ## Set the logger and its level
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-def server(source_host, output_host):
+def server(source_host, output_host, delete_rar=False):
     """ Validate the incoming query and add it to the SynoIndex database.
 
     Arguments:
@@ -27,6 +28,7 @@ def server(source_host, output_host):
     ## Check whether the source file exists
     logger.debug("Source: %s" % source_host)
     logger.debug("Output: %s" , output_host)
+    logger.debug("Delete-RAR: %s" , delete_rar)
 
     if not output_host:
         if not os.path.isfile(source_host):
@@ -41,6 +43,14 @@ def server(source_host, output_host):
         if not os.path.isfile(source_host):
             logger.error("[-] Error: Moving file failed")
             return "[-] Error: Moving file failed"
+        if delete_rar:
+            cur_dir = os.path.curdir(source_host)
+            rar_files = files_find_ext(cur_dir, "rar")
+            if rar_files:
+                basename = [os.path.splitext(os.path.basename(r))[0] for r in rar_files][0]
+                files = files_find_basename(cur_dir, basename)
+                original_file = [f for f in files if os.path.splitext(f)[1] in ["mkv", "mp4", "avi"]][0]
+                os.remove(original_file)
 
     ## Add the file to synoindex database
     cmds = ['synoindex', '-A', source_host.encode('UTF-8')]
