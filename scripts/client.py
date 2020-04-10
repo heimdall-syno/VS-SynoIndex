@@ -7,7 +7,6 @@ from urllib.parse import urlencode
 
 ## Add the VS-Utils submodule to the python path
 par_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), os.pardir))
-cur_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(par_dir, "VS-Utils"))
 from parse import parse_cfg
 from prints import debugmsg, errmsg
@@ -16,7 +15,7 @@ from prints import debugmsg, errmsg
 def client(source_host, output_host=None):
 
 	## Parse the config
-	config_file = os.path.join(cur_dir, "config.txt")
+	config_file = os.path.join(par_dir, "config.txt")
 	cfg = parse_cfg(config_file, "vs-synoindex", "docker")
 
 	## Call the url and get the answer of the server

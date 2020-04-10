@@ -5,7 +5,6 @@ import os, sys, subprocess, logging, shutil
 
 ## Add the VS-Utils submodule to the python path
 par_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), os.pardir))
-cur_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(par_dir, "VS-Utils"))
 from files import create_path_directories, files_find_ext
 from files import files_find_basename
@@ -45,11 +44,11 @@ def server(source_host, output_host, delete_rar=False):
             logger.error("[-] Error: Moving file failed")
             return "[-] Error: Moving file failed"
         if delete_rar:
-            cur_dir = os.path.curdir(source_host)
-            rar_files = files_find_ext(cur_dir, "rar")
+            source_host_dir = os.path.curdir(source_host)
+            rar_files = files_find_ext(source_host_dir, "rar")
             if rar_files:
                 basename = [os.path.splitext(os.path.basename(r))[0] for r in rar_files][0]
-                files = files_find_basename(cur_dir, basename)
+                files = files_find_basename(source_host_dir, basename)
                 original_file = [f for f in files if os.path.splitext(f)[1] in ["mkv", "mp4", "avi"]][0]
                 os.remove(original_file)
 
