@@ -4,8 +4,9 @@
 import os, sys, subprocess, logging, shutil
 
 ## Add the VS-Utils submodule to the python path
+par_dir = os.path.abspath(os.path.join(os.path.abspath(__file__), os.pardir))
 cur_dir = os.path.dirname(os.path.abspath(__file__))
-sys.path.append(os.path.join(cur_dir, "VS-Utils"))
+sys.path.append(os.path.join(par_dir, "VS-Utils"))
 from files import create_path_directories, files_find_ext
 from files import files_find_basename
 

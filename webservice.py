@@ -6,6 +6,7 @@ import os, sys, web, logging
 ## Add the VS-Utils submodule to the python path
 cur_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.join(cur_dir, "VS-Utils"))
+sys.path.append(os.path.join(cur_dir, "scripts"))
 from parse import parse_cfg
 from server import server
 
