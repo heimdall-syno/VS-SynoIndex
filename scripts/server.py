@@ -1,18 +1,48 @@
 #################################################
 ##              Scope: Host system             ##
 #################################################
-import os, sys, subprocess, logging, shutil
-
-## Add the VS-Utils submodule to the python path
-cur_dir = os.path.dirname(os.path.realpath(__file__))
-par_dir = os.path.join(cur_dir, os.pardir)
-sys.path.append(os.path.join(par_dir, "VS-Utils"))
-from files import create_path_directories, files_find_ext
-from files import files_find_basename
+import os, sys, errno, fnmatch, subprocess, logging, shutil
 
 ## Set the logger and its level
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+def server_create_path(path):
+    """ Create all directories along a given path.
+
+    Arguments:
+        path {string} -- Path to the directory.
+    """
+
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path): pass
+        else: raise
+
+def server_files_with_extension(path, ext):
+    ''' Find all files in a path with a given file extension. '''
+
+    files = []
+    if os.path.isfile(path):
+        path_ext = os.path.splitext(path)[1].split(".")[-1]
+        if (path_ext in ext and "sample" not in os.path.basename(path)):
+            return [path]
+    for root, _, filenames in os.walk(path):
+        for filename in fnmatch.filter(filenames, "*.%s" % ext):
+            if ("sample" not in filename):
+                files.append(os.path.join(root, filename))
+    return files
+
+def server_files_with_basename(path, basename):
+    ''' Find all files in a path with a given file basename. '''
+
+    files = []
+    for root, _, filenames in os.walk(path):
+        for filename in fnmatch.filter(filenames, "%s.*" % basename):
+            if ("sample" not in filename):
+                files.append(os.path.join(root, filename))
+    return files
 
 def server(source_host, output_host, delete_rar=False):
     """ Validate the incoming query and add it to the SynoIndex database.
@@ -38,7 +68,7 @@ def server(source_host, output_host, delete_rar=False):
 
     ## Move the converted output file first if needed
     else:
-        create_path_directories(os.path.dirname(source_host))
+        server_create_path(os.path.dirname(source_host))
         shutil.move(output_host, source_host)
         logger.debug("Moved file first")
         if not os.path.isfile(source_host):
@@ -46,10 +76,10 @@ def server(source_host, output_host, delete_rar=False):
             return "[-] Error: Moving file failed"
         if delete_rar:
             source_host_dir = os.path.curdir(source_host)
-            rar_files = files_find_ext(source_host_dir, "rar")
+            rar_files = server_files_with_extension(source_host_dir, "rar")
             if rar_files:
                 basename = [os.path.splitext(os.path.basename(r))[0] for r in rar_files][0]
-                files = files_find_basename(source_host_dir, basename)
+                files = server_files_with_basename(source_host_dir, basename)
                 original_file = [f for f in files if os.path.splitext(f)[1] in ["mkv", "mp4", "avi"]][0]
                 os.remove(original_file)
 
