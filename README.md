@@ -25,10 +25,15 @@ Check out the second part of the toolchain - VS-Handbrake (https://github.com/he
 ```
 
 Check out the other components:
-    VS-Transmission:   https://github.com/heimdall-syno/VS-Transmission
-    VS-Handbrake:      https://github.com/heimdall-syno/VS-Handbrake
-    VS-Notification:   https://github.com/heimdall-syno/VS-Notification
-    VS-Playlist-Share: https://github.com/heimdall-syno/VS-Playlist-Share
+
+
+VS-Transmission:   https://github.com/heimdall-syno/VS-Transmission
+
+VS-Handbrake:      https://github.com/heimdall-syno/VS-Handbrake
+
+VS-Notification:   https://github.com/heimdall-syno/VS-Notification
+
+VS-Playlist-Share: https://github.com/heimdall-syno/VS-Playlist-Share
 
 ## Quick Start
 
