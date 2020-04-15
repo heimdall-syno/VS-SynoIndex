@@ -85,17 +85,18 @@ def server(source_host, output_host, original):
     """
 
     ## Parse the original
-    original = server_parse_dig(original, 1, 3)
+    original = server_parse_dig(original, 0, 3)
 
     ## Check whether source file exists
     logger.debug("Source: {}, Output: {}, Original: {}".format(source_host, output_host, original))
 
     ## VS-Transmission - No converted output file -> add the source file and ignore original
-    if not output_host:
+    if output_host == None or output_host == "":
         if not os.path.isfile(source_host):
             logger.error("Source File does not exist anymore")
             return "Source File does not exist anymore"
         synoindex_file_add(source_host)
+        logging.debug("Query executed")
         return "Query executed"
 
     ## Move the converted output file first if needed
@@ -131,4 +132,5 @@ def server(source_host, output_host, original):
             server_oldfile_delete(source_host, output_host)
 
     synoindex_file_add(source_host)
+    logging.debug("Query executed")
     return "Query executed"
