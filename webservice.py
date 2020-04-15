@@ -1,7 +1,7 @@
 #################################################
 ##              Scope: Host system             ##
 #################################################
-import os, sys, web, netifaces, argparse, logging, threading, time
+import os, sys, web, netifaces, logging
 
 ## Add the scripts subdirectory to the python path
 cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -29,8 +29,9 @@ class HostWebserver(web.application):
 
 class webservice:
     def GET(self, name):
-        user_data = web.input(source_host="", output_host="")
-        result = server(user_data.source_host, user_data.output_host)
+        user_data = web.input(source_host="", output_host="", original="0")
+        result = server(user_data.source_host, user_data.output_host,
+                        user_data.original)
         return result
 
 if __name__ == "__main__":
