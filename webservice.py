@@ -18,14 +18,22 @@ class DockerWebserver(web.application):
         func = self.wsgifunc(*middleware)
         netifaces.ifaddresses('docker0')
         ip = netifaces.ifaddresses('docker0')[netifaces.AF_INET][0]['addr']
-        return web.httpserver.runsimple(func, (ip, args.dockerport))
+        try:
+            web.httpserver.runsimple(func, (ip, args.dockerport))
+        except OSError as e:
+            exit("Error: Port is already in use")
+        return
 
 class HostWebserver(web.application):
     def run(self, port=args.hostport, *middleware):
         func = self.wsgifunc(*middleware)
         netifaces.ifaddresses('lo')
         ip = netifaces.ifaddresses('lo')[netifaces.AF_INET][0]['addr']
-        return web.httpserver.runsimple(func, (ip, args.hostport))
+        try:
+            web.httpserver.runsimple(func, (ip, args.dockerport))
+        except OSError as e:
+            exit("Error: Port is already in use")
+        return
 
 class webservice:
     def GET(self, name):

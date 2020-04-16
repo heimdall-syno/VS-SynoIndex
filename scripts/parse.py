@@ -43,11 +43,13 @@ def parse_arguments():
 
     ## Check whether only one port is passed
     if (args.dockerport != None and args.hostport != None):
-        raise argparse.ArgumentTypeError("Error: Server can only run on one interface")
+        exit("Error: Server can only run on one interface")
+    elif (args.dockerport == None and args.hostport == None):
+        exit("Error: Define one port for the host- or docker interface")
 
     ## Parse the log file
     if not os.path.isdir(args.log):
-        argparse.ArgumentTypeError("Error: Invalid parameter for argument \"--log\"")
+        exit("Error: Invalid parameter for argument \"--log\"")
     server_log = os.path.join(args.log, "server.log")
     if not os.path.isfile(server_log): open(server_log, 'a').close()
     args.log = server_log
