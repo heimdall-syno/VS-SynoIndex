@@ -20,7 +20,7 @@ class DockerWebserver(web.application):
         ip = netifaces.ifaddresses('docker0')[netifaces.AF_INET][0]['addr']
         try:
             web.httpserver.runsimple(func, (ip, args.dockerport))
-        except OSError as e:
+        except OSError:
             exit("Error: Port is already in use")
         return
 
@@ -31,15 +31,14 @@ class HostWebserver(web.application):
         ip = netifaces.ifaddresses('lo')[netifaces.AF_INET][0]['addr']
         try:
             web.httpserver.runsimple(func, (ip, args.dockerport))
-        except OSError as e:
+        except OSError:
             exit("Error: Port is already in use")
         return
 
 class webservice:
     def GET(self, name):
-        user_data = web.input(source_host="", output_host="", original="0")
-        result = server(user_data.source_host, user_data.output_host,
-                        user_data.original)
+        query = web.input(source_host="", output_host="", original_host="", original_mode="0")
+        result = server(query.source_host, query.output_host, query.original_host, query.original_mode)
         return result
 
 if __name__ == "__main__":
