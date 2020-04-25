@@ -30,7 +30,7 @@ class HostWebserver(web.application):
         netifaces.ifaddresses('lo')
         ip = netifaces.ifaddresses('lo')[netifaces.AF_INET][0]['addr']
         try:
-            web.httpserver.runsimple(func, (ip, args.dockerport))
+            web.httpserver.runsimple(func, (ip, args.hostport))
         except OSError:
             exit("Error: Port is already in use")
         return
