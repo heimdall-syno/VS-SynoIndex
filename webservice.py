@@ -11,7 +11,7 @@ from parse import parse_arguments
 
 ## Parse the shell arguments
 args = parse_arguments()
-logging.basicConfig(filename=args.log, filemode='a', format='%(asctime)s - %(levelname)s: %(message)s')
+logging.basicConfig(filename=args.log, filemode='a', format='[%(asctime)s] Server - %(levelname)s: %(message)s')
 
 class DockerWebserver(web.application):
     def run(self, port=args.dockerport, *middleware):
