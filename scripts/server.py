@@ -54,33 +54,39 @@ def server_files_with_basename(path, basename):
                 files.append(os.path.join(root, filename))
     return files
 
-def server_file_delete(directory, filename):
-    file_path = os.path.join(directory, filename)
-    if os.path.isfile(file_path):
-        os.remove(file_path)
-        logger.debug("Delete the RAR archive output file: {}".format(file_path))
-        return True
-
 def synoindex_file_add(filename):
-    ''' Add the converted file to synoindex database. '''
+    ''' Add the converted file to synoindex database (synoindex -a <filename>)'''
 
     cmds = ['synoindex', '-a', filename.encode('UTF-8')]
     logger.debug("Add video file to SynoIndex: {}".format(filename))
     process = Popen(cmds, stdout=PIPE, stderr=PIPE)
     process.communicate()
 
-def synoindex_file_delete(filename):
-    ''' Add the converted file to synoindex database. '''
+def rar_filelist(filename):
+    ''' File list of RAR archive (unrar -lb <filename>) '''
 
-    cmds = ['synoindex', '-d', filename.encode('UTF-8')]
-    logger.debug("Delete video file from SynoIndex: {}".format(filename))
-    process = Popen(cmds, stdout=PIPE, stderr=PIPE)
-    process.communicate()
+    process = Popen(["unrar", "lb", filename], stdout=PIPE, stderr=PIPE)
+    stdout, stderr = process.communicate()
+    if process.returncode == 0 and stdout:
+        files = list(filter(None, stdout.decode("UTF-8").split("\n")))
+        files = [os.path.join(os.path.dirname(filename), f) for f in files]
+        return [f for f in files if os.path.isfile(f)]
+    else:
+        logger.debug("Unrar failed: {}, {}".format(process.returncode, stderr))
+        return []
 
-def synoindex_oldfile_delete(original_file):
-    logger.debug("Old file: {}".format(original_file))
-    if os.path.isfile(original_file):
-        synoindex_file_delete(original_file)
+def server_file_delete(filename, remove=None):
+    ''' Remove file by absolute path from synoindex (and from filesystem) '''
+
+    if os.path.isfile(filename):
+        cmds = ['synoindex', '-d', filename.encode('UTF-8')]
+        logger.debug("Delete video file from SynoIndex: {}".format(filename))
+        process = Popen(cmds, stdout=PIPE, stderr=PIPE)
+        process.communicate()
+        if remove:
+            os.remove(filename)
+            logger.debug("Delete archive output file: {}".format(filename))
+        return True
 
 def server(target_file, move_from, original_file, original_mode):
     """ Validate the incoming query and add it to the SynoIndex database.
@@ -125,28 +131,24 @@ def server(target_file, move_from, original_file, original_mode):
         logger.error("Moving and renaming file failed")
         return "Error: Moving and renaming file failed"
 
-    if original_mode == 0: ## (Leave) The source file remains unchanged -> add the converted file
+    ## (Leave): The source file remains unchanged -> add the converted file
+    if original_mode == 0:
         pass
 
-    elif original_mode == 1: ## (Ignore) The source file remains unchanged but not synoindexed.
-        synoindex_oldfile_delete(original_file)
+    ## (Ignore): The source file remains unchanged but not synoindexed.
+    elif original_mode == 1:
+        server_file_delete(original_file)
 
-    elif (original_mode == 2 or original_mode == 3): ## (Delete) If extracted from RAR archive delete the source file.
+    ## (Delete): If extracted from RAR archive delete the source file.
+    elif (original_mode == 2 or original_mode == 3):
         rar_files = server_files_with_extension(target_file_dir, "rar")
-        if rar_files:
-            rar_file = rar_files[0]
+        for rar_file in rar_files:
             logger.debug("Found a RAR archive in the source directory: {}".format(rar_file))
-            process = Popen(["unrar", "lb", rar_file], stdout=PIPE, stderr=PIPE)
-            stdout, stderr = process.communicate()
-            if process.returncode == 0 and stdout:
-                rar_outputs = list(filter(None, stdout.decode("UTF-8").split("\n")))
-                deleted = [server_file_delete(target_file_dir, rar_output) for rar_output in rar_outputs]
-                if not deleted: logger.debug("Nothing deleted due to none of the output files exist")
-            else:
-                logger.debug("Nothing deleted due to unrar failed: {}, {}".format(process.returncode, stderr))
+            for ur in rar_filelist(rar_file): server_file_delete(ur, True)
 
-        elif (original_mode == 3): ##  (Ignore|Delete): If extracted from RAR archive delete it otherwise ignore it.
-            synoindex_oldfile_delete(original_file)
+    ##  (Ignore|Delete): If extracted from RAR archive delete it otherwise ignore it.
+    elif (original_mode == 3):
+        server_file_delete(original_file)
 
     synoindex_file_add(target_file)
     logging.debug("Query executed")
