@@ -31,11 +31,6 @@ def server_files_with_extension(path, ext):
 
     exts = ext if isinstance(ext, str) else tuple(ext)
 
-    ## if the passed path is a single file
-    if os.path.isfile(path) and path.endswith(exts):
-        if ("sample" not in os.path.basename(path)):
-            return [path]
-
     ## If the passed path is a directory then search all files recursively
     ext_files = []
     for filename in glob.iglob(os.path.join(path, '') + '**/*', recursive=True):
@@ -125,8 +120,9 @@ def server(target_file, move_from, original_file, original_mode):
     ## Move the handbrake output file first if needed
     target_file_dir = os.path.dirname(target_file)
     server_create_path(target_file_dir)
+    logger.debug("Move source file before indexing it - {} -> {}".format(move_from, target_file))
     shutil.move(move_from, target_file)
-    logger.debug("Move and rename source file before indexing it")
+    logger.debug("Moved source file")
     if not os.path.isfile(target_file):
         logger.error("Moving and renaming file failed")
         return "Error: Moving and renaming file failed"
@@ -146,9 +142,9 @@ def server(target_file, move_from, original_file, original_mode):
             logger.debug("Found a RAR archive in the source directory: {}".format(rar_file))
             for ur in rar_filelist(rar_file): server_file_delete(ur, True)
 
-    ##  (Ignore|Delete): If extracted from RAR archive delete it otherwise ignore it.
-    elif (original_mode == 3):
-        server_file_delete(original_file)
+        ##  (Ignore|Delete): If extracted from RAR archive delete it otherwise ignore it.
+        if (not rar_files and original_mode == 3):
+            server_file_delete(original_file)
 
     synoindex_file_add(target_file)
     logging.debug("Query executed")
