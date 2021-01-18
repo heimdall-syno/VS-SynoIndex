@@ -1,7 +1,8 @@
 #################################################
 ##              Scope: Host system             ##
 #################################################
-import os, sys, web, netifaces, logging
+import os, sys, web, logging
+import socket, fcntl, struct
 
 ## Add the scripts subdirectory to the python path
 cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -13,11 +14,14 @@ from parse import parse_arguments
 args = parse_arguments()
 logging.basicConfig(filename=args.log, filemode='a', format='[%(asctime)s] Server - %(levelname)s: %(message)s')
 
+def get_ip_address(ifname):
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    return socket.inet_ntoa(fcntl.ioctl(s.fileno(), 0x8915, struct.pack('256s', bytes(ifname[:15], 'utf-8')))[20:24])
+
 class DockerWebserver(web.application):
     def run(self, port=args.dockerport, *middleware):
         func = self.wsgifunc(*middleware)
-        netifaces.ifaddresses('docker0')
-        ip = netifaces.ifaddresses('docker0')[netifaces.AF_INET][0]['addr']
+        ip = get_ip_address('docker0')
         try:
             web.httpserver.runsimple(func, (ip, args.dockerport))
         except OSError:
@@ -27,8 +31,7 @@ class DockerWebserver(web.application):
 class HostWebserver(web.application):
     def run(self, port=args.hostport, *middleware):
         func = self.wsgifunc(*middleware)
-        netifaces.ifaddresses('lo')
-        ip = netifaces.ifaddresses('lo')[netifaces.AF_INET][0]['addr']
+        ip = get_ip_address('lo')
         try:
             web.httpserver.runsimple(func, (ip, args.hostport))
         except OSError:
